@@ -55,7 +55,7 @@ ImportOriginalDataset <- function(){
 # Returns: The dataframe where the variables have been reversed.
 
 ImportReversedDF <- function(){
-  sourcedf <- read_csv("processeddata//df_reversed.csv",show_col_types = FALSE) 
+  sourcedf <- read_csv("../data/processed/df_reversed.csv",show_col_types = FALSE) 
   return(sourcedf)
 }
 

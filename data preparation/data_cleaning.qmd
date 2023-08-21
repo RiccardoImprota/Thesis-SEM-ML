@@ -78,8 +78,6 @@ summary(df$predict_earnings)
 ```{r}
 # Check summaries for work engagement
 summary(df$eng_energy)
-summary(df$eng_enthusiastic)
-summary(df$eng_timeflies)
 ```
 
 ## Handle Missing Values
@@ -96,6 +94,11 @@ df <- df %>%
 # Check summaries again for 'seniority' and 'predict_earnings' variables
 summary(df$seniority)
 summary(df$predict_earnings)
+
+# Check summaries for work engagement
+summary(df$eng_timeflies)
+summary(df$eng_energy)
+summary(df$eng_enthusiastic)
 ```
 
 ## **Filter for Specific Country and Non-NA Variables of what we want to predict**
@@ -115,7 +118,8 @@ summary(df$predict_earnings)
 
 ### Outliers
 
-There's a bunch of outliers that were removed based on a z-score method.
+There's 2 outliers that were removed based on a z-score method, the choice of z reflects our objective to 
+remove these two outliers, will still making the code resilient enough if we want to explore other countries.
 
 ```{r}
 # Visualize potential outliers with a boxplot
@@ -173,15 +177,19 @@ ggplot(na_count, aes(x = value, y = reorder(variable, value))) +
 ```{r}
 df_numeric <- df %>%
   mutate_all(~ as.numeric(as.character(.)))
-
 ```
 
 ```{r}
-write_spss(df, "processeddata//df.sav")
-write_csv(df_numeric, "processeddata//df_numeric.csv")
+# just saving the datasets in different formats
+write_spss(df, "../data/processed/df_numeric.sav")
+write_csv(df_numeric, "../data/processed/df_numeric.csv")
 ```
 
 ```{r}
+
+# This code is functionally useless for the reader, but it was made to setup a .csv
+# where I could manually label the variables that needed to be reversed.
+# I used Cronbach Alpha scores to help me through the process.
 
 var_info <- tibble(variables = character(),
                    labels = character(), 
@@ -202,6 +210,6 @@ for (var in names(df)) {
 
 }
 
-write_csv(var_info, "processeddata//var_info.csv")
+#write_csv(var_info, "../data/processed/var_info.csv")
 
 ```
