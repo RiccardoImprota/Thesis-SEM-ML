@@ -1,0 +1,207 @@
+---
+title: "data_cleaning"
+author: "Riccardo Improta"
+format: html
+---
+
+### Loading Libraries
+
+```{r}
+
+# Tidyverse
+library(dplyr)
+library(purrr)
+library(readr)
+library(ggplot2)
+library(tidyr)
+
+
+# Additional libraries used for this analysis
+library(sjlabelled)  # Labeling data
+library(psych)  # Psychometric analysis and data manipulation
+
+# Load custom functions from external script
+source("functions.R")
+```
+
+# Data Cleaning
+
+### Parameters
+Here we can set parameters to select other countries or target variables.
+The parameters set are those necessary for the scope of this work.
+```{r}
+# Specify the country of interest: Italy (16)
+countries <- c(16)
+
+# Define the variables of interest
+variablestopredict <- c("eng_energy", "eng_enthusiastic", "eng_timeflies")
+
+# Determine whether to include M1 questions in the analysis (more NAs, but more variables)
+consideringM1<-TRUE
+```
+
+## Reading the data
+
+```{r}
+# Import the original dataset using a custom function
+sourcedf <- ImportOriginalDataset()
+
+# Check the levels and labels of the 'private_sector' variable to see if the data is sound
+levels(sourcedf$private_sector)
+names(attributes(sourcedf$private_sector)$labels)
+```
+
+## Selecting the variables
+
+The selection of variables is determined based on a manually curated .csv file named 'used_variables.csv'. This file contains the variables deemed relevant for this research.
+
+```{r}
+# If consideringM1 is FALSE, exclude M1 from selected variables
+usedvar <- ImportUsedvar(M1 = consideringM1)
+```
+
+```{r}
+# Select the necessary variables from the dataset, filter for employees, and remove the 'employee_selfdeclared' variable
+df <- sourcedf %>% 
+  select(all_of(usedvar$variable)) %>% 
+  filter(employee_selfdeclared == 1) %>% 
+  select(-employee_selfdeclared)
+
+
+# Update the list of used variables, removing 'employee_selfdeclared' after filtering
+usedvar <- usedvar %>% filter(variable != "employee_selfdeclared")
+
+# Check summaries for 'seniority' and 'predict_earnings' variables
+summary(df$seniority)
+summary(df$predict_earnings)
+```
+```{r}
+# Check summaries for work engagement
+summary(df$eng_energy)
+summary(df$eng_enthusiastic)
+summary(df$eng_timeflies)
+```
+
+## Handle Missing Values
+
+```{r}
+# Define the values that need to be replaced with NA
+values_to_na <- c(-777, -888,-998, -999)
+
+# Replace these values with NA in the dataset, and drop unused levels in factor variables
+df <- df %>%
+  mutate(across(everything(), ~replace(., . %in% values_to_na, NA)))
+  #%>%  mutate(across(where(is.factor), ~droplevels(.)))
+
+# Check summaries again for 'seniority' and 'predict_earnings' variables
+summary(df$seniority)
+summary(df$predict_earnings)
+```
+
+## **Filter for Specific Country and Non-NA Variables of what we want to predict**
+
+Here we select the rows that concern Italy and the rows that include the worker engagement information - notice that the worker engagement variables are only available in a M2 subset of the survey and that's why there are a lot of NAs
+
+```{r}
+# Filter for the specified country (Italy) and ensure all outcome variables have non-NA values
+df <- df %>%
+  filter(Country %in% countries) %>%
+  filter(across(all_of(variablestopredict), any_vars(!is.na(.))))
+
+# Check summaries again for 'seniority' and 'predict_earnings' variables to compare with previous scripts
+summary(df$seniority)
+summary(df$predict_earnings)
+```
+
+### Outliers
+
+There's a bunch of outliers that were removed based on a z-score method.
+
+```{r}
+# Visualize potential outliers with a boxplot
+boxplot(df$age, df$seniority, df$usual_hours_week, names = c("age", "seniority", "usual_hours_week"), 
+        main = "Boxplot of Variables",
+        xlab = "Variable",
+        ylab = "Value",
+        col = "lightblue")
+
+```
+
+```{r}
+# Define a function to remove extreme outliers (those that fall outside a specified number of standard deviations from the mean)
+remove_extreme_outliers <- function(df, threshold = 4) {
+  
+  # Store original number of rows
+  original_nrow <- nrow(df)
+  
+  # Iterate over all numeric columns
+  df <- df %>% 
+    mutate(across(where(is.numeric), 
+                  list(outlier = ~ifelse(is.na(.), NA, abs((. - mean(., na.rm = TRUE)) / sd(., na.rm = TRUE)) <= threshold)),
+                  .names = "{.col}_outlier")) %>%
+    filter(if_all(ends_with("_outlier"), ~is.na(.) | .)) %>%
+    select(-ends_with("_outlier"))
+  
+  # Calculate and print number of rows removed
+  removed_rows <- original_nrow - nrow(df)
+  print(paste("Removed", removed_rows, "rows"))
+  
+  return(df)
+}
+
+
+df <- remove_extreme_outliers(df)
+```
+
+```{r}
+# Get the count of NA values for each column in your dataframe
+na_count <- df %>% summarise_all(function(x) sum(is.na(x)))
+
+na_count <- na_count %>% pivot_longer(cols = everything(), names_to = "variable", values_to = "value")
+
+# Create histogram
+ggplot(na_count, aes(x = value, y = reorder(variable, value))) +
+  geom_bar(stat = "identity", width = 0.5, fill = "steelblue") +
+  labs(x = "Count of NA", y = "Variable") +
+  xlim(0, nrow(df)) +
+  theme(axis.text.y = element_text(angle = 0, hjust = 1)) 
+
+```
+
+# **Finalize and Save the Cleaned Dataset**
+
+```{r}
+df_numeric <- df %>%
+  mutate_all(~ as.numeric(as.character(.)))
+
+```
+
+```{r}
+write_spss(df, "processeddata//df.sav")
+write_csv(df_numeric, "processeddata//df_numeric.csv")
+```
+
+```{r}
+
+var_info <- tibble(variables = character(),
+                   labels = character(), 
+                   Values = character())
+
+# Loop through each variable
+for (var in names(df)) {
+  
+  levels <- as.character(levels(df[[var]]))
+  names <- names(attributes(df[[var]])$labels)
+  combined <- paste(levels, names, sep = ": ")
+  output <- paste0("{", paste(combined, collapse = ", "), "}")
+  
+    var_info <- var_info %>% 
+      add_row(variables = var, 
+              labels = attr(df[[var]], "label"),
+              Values = output)
+
+}
+
+write_csv(var_info, "processeddata//var_info.csv")
+
+```

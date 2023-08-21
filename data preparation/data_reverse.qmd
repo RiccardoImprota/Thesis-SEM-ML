@@ -1,0 +1,128 @@
+---
+title: "Reverse Variables"
+format: html
+---
+
+## Loading Libraries
+
+```{r}
+# Tidyverse
+library(dplyr)  # Data manipulation
+library(purrr)  # Functional programming
+library(readr)  # Data import
+
+# Additional libraries used for this analysis
+library(sjlabelled)  # Labeling data
+library(psych)  # Psychometric analysis and data manipulation
+source("analyses/functions.R")
+library(corrplot)
+
+```
+
+\-\--
+
+```{r}
+df <- read_csv("processeddata\\df_numeric.csv", show_col_types = FALSE)
+reversedf<-read_csv2("processeddata\\var_to_reverse.csv", show_col_types = FALSE)
+```
+
+```{r}
+vars_to_reverse <- as.character(na.omit(reversedf[reversedf$toreverse == 'y', ])$variables)
+```
+
+```{r}
+
+reverse_variable <- function(x) {
+    max_val = max(x, na.rm = TRUE)
+    min_val = min(x, na.rm = TRUE)
+    return(max_val - x + min_val)
+}
+
+print(head(df$noise,15))
+
+df <- df %>% 
+  mutate(across(all_of(vars_to_reverse), reverse_variable))
+
+print(head(df$noise,15))
+```
+
+```{r}
+usedvar <- ImportUsedvar(M1=TRUE) %>% filter(variable != "employee_selfdeclared")
+dimensionsdf<- usedvar %>% filter(!is.na(dimension)) %>% select(variable, dimension)
+
+```
+
+```{r}
+write_csv(df, "processeddata//df_reversed.csv")
+```
+
+# Compute cronbach
+
+```{r}
+dimensionsdf$dimension %>% 
+    unique() %>% 
+    purrr::map_df(~list( dimension = .x,
+    alpha = psych::alpha(df[, dimensionsdf$variable[dimensionsdf$dimension == .x]],check.keys = TRUE)$total[["raw_alpha"]]
+  ))
+```
+
+Since we're interested in computing Cronbach's alpha, we're going to remove variables that are numeric or dichotomous 
+
+```{r}
+# Get the names of the columns where max value is either 2 or above 6
+variables_to_remove <- names(df)[sapply(df, function(x) max(x, na.rm = TRUE) %in% 2 | max(x, na.rm = TRUE) > 6)]
+
+# Keep only variables_to_remove_for_alpha that are present in the "variable" column of dimensionsdf
+variables_to_remove <- variables_to_remove[variables_to_remove %in% dimensionsdf$variable]
+
+# Remove those columns from df
+df <- df %>% select(-variables_to_remove)
+dimensionsdf <- dimensionsdf %>% filter(!variable %in% all_of(variables_to_remove))
+```
+
+```{r}
+dimensionsdf$dimension %>% 
+    unique() %>% 
+    purrr::map_df(~list( dimension = .x,
+    alpha = psych::alpha(df[, dimensionsdf$variable[dimensionsdf$dimension == .x]],check.keys = TRUE)$total[["std.alpha"]]
+  ))
+```
+
+```{r}
+### Complete alpha output for all dimensions
+
+for (dim in unique(dimensionsdf$dimension)) {
+
+  message <- paste("Dimension being considered:", dim)
+  border <- strrep("*", nchar(message) + 4)
+  cat(paste0("\n", border, "\n* ", message, " *\n", border, "\n"), sep = "")
+  
+  
+
+  # Get the variables for the desired dimension
+  dim_variables <- dimensionsdf$variable[dimensionsdf$dimension == dim]
+
+  # Remove the excluded variables
+  exclude_var <- c()
+  dim_variables <- dim_variables[!dim_variables %in% exclude_var]
+  
+  
+  # Compute the alpha coefficient
+  print(psych::alpha(df[, dim_variables]))
+  
+  # Create the correlation matrix
+  df_corr <- df[, dim_variables]
+  corr_matrix <- cor(df_corr, use="pairwise.complete.obs")
+  
+  # Add extra margin at the top
+  par(mar = c(4, 4, 2, 2) + 0.1)
+
+  # Create the correlation plot
+  corrplot(corr_matrix, method = "color", order = "hclust", 
+         addCoef.col = "black", # Add correlation coefficient to the plot
+         tl.col = "black", tl.srt = 45, # Text color and rotation
+         title=dim, # Set the title
+     mar=c(0,0,1,0) # http://stackoverflow.com/a/14754408/54964
+)
+}
+```
