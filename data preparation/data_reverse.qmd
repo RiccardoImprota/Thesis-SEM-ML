@@ -14,24 +14,25 @@ library(readr)  # Data import
 # Additional libraries used for this analysis
 library(sjlabelled)  # Labeling data
 library(psych)  # Psychometric analysis and data manipulation
-source("analyses/functions.R")
+source("functions.R")
 library(corrplot)
 
 ```
 
-\-\--
+# Reversing variables
 
+To choose which variables to reverse we will use the manually prepared .csv
 ```{r}
-df <- read_csv("processeddata\\df_numeric.csv", show_col_types = FALSE)
-reversedf<-read_csv2("processeddata\\var_to_reverse.csv", show_col_types = FALSE)
+df <- read_csv("../data/processed/df_numeric.csv", show_col_types = FALSE)
+reversedf<-read_csv2("../data/var_to_reverse.csv", show_col_types = FALSE)
 ```
-
 ```{r}
+# Using the syntax of the prepared .csv, we can setup an array of variables to reverse
 vars_to_reverse <- as.character(na.omit(reversedf[reversedf$toreverse == 'y', ])$variables)
 ```
 
 ```{r}
-
+# Define a function to reverse the scale of a numeric variable.
 reverse_variable <- function(x) {
     max_val = max(x, na.rm = TRUE)
     min_val = min(x, na.rm = TRUE)
@@ -40,33 +41,33 @@ reverse_variable <- function(x) {
 
 print(head(df$noise,15))
 
+# Apply the reverse_variable function to specified columns in the dataframe.
 df <- df %>% 
   mutate(across(all_of(vars_to_reverse), reverse_variable))
 
+# Print the first 15 values of 'noise' column after the reversal for verification
 print(head(df$noise,15))
 ```
 
 ```{r}
+
 usedvar <- ImportUsedvar(M1=TRUE) %>% filter(variable != "employee_selfdeclared")
 dimensionsdf<- usedvar %>% filter(!is.na(dimension)) %>% select(variable, dimension)
-
 ```
 
 ```{r}
-write_csv(df, "processeddata//df_reversed.csv")
+#Saving the new dataframe where the correct variables are reversed
+write_csv(df, "../data/processed//df_reversed.csv")
 ```
 
-# Compute cronbach
+# Computing Cronbach's Alpha for EWCS-defined variables.
 
-```{r}
-dimensionsdf$dimension %>% 
-    unique() %>% 
-    purrr::map_df(~list( dimension = .x,
-    alpha = psych::alpha(df[, dimensionsdf$variable[dimensionsdf$dimension == .x]],check.keys = TRUE)$total[["raw_alpha"]]
-  ))
-```
+This was used to compute the Cronbach's Alpha for the dimensions that were defined according to the EWCS variables.
 
-Since we're interested in computing Cronbach's alpha, we're going to remove variables that are numeric or dichotomous 
+It must be noted that these are not the dimensions that were used for Machine learning due to their low reliability. EGA-defined factors were used instead.
+
+Since we're interested in computing Cronbach's alpha, we're going to remove variables that are numeric or dichotomous.
+
 
 ```{r}
 # Get the names of the columns where max value is either 2 or above 6
