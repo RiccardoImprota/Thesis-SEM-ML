@@ -1,0 +1,96 @@
+---
+title: "EGA Dimensions"
+format: html
+---
+
+# **Exploratory Graph Analysis to perform item clustering**
+
+For the scope of this Thesis, it was decided to use EGA to select the dimensions for the Confirmatory factor analysis.
+
+```{r}
+# Tidyverse
+library(dplyr)  # Data manipulation
+library(purrr)  # Functional programming
+library(readr)  # Data import
+
+# EGA
+source("../Data Preparation/functions.R")
+library(EGAnet)
+library(sna)
+```
+
+```{r}
+df <-ImportReversedDF()
+
+# Get the names of the columns where max value is either 2 or above 6
+variables_to_remove <- names(df)[sapply(df, function(x) max(x, na.rm = TRUE) %in% 2 | max(x, na.rm = TRUE) > 6)]
+
+df <- df %>% select(-variables_to_remove,-ID, -SurveyCombination_M1, -SurveyCombination_M2, -Country,-private_sector,-empl_contract,-eng_energy,-eng_enthusiastic,-eng_timeflies)
+
+df <- df %>% select(-telework,-losejob,-undesirable_change,-predict_earnings)
+```
+## Removing items with low stability
+
+We remove items that are not found reliably in the same clusters from the dataset
+
+```{r}
+preliminarybootdata <- bootEGA(
+                    df,
+                    iter= 1000, 
+                    seed = 42,
+                    algorithm = 'louvain',
+                    type = "resampling",
+                    progress = FALSE,
+                    )
+```
+
+```{r}
+preliminaryIS <- itemStability(preliminarybootdata)
+```
+
+```{r}
+names_to_remove <- names(preliminaryIS$item.stability$empirical.dimensions)[preliminaryIS$item.stability$empirical.dimensions < 0.8]
+
+df <- df %>%
+  select(-all_of(names_to_remove))
+```
+
+## EGA clustering
+
+We perform the clustering with stable variables and then save the results.
+
+```{r}
+bootdata <- bootEGA(
+                    df,
+                    iter= 1000, 
+                    seed = 42,
+                    algorithm = 'louvain',
+                    type = "resampling",
+                    progress = FALSE,
+                    )
+```
+
+```{r}
+IS <- itemStability(bootdata)
+```
+
+```{r}
+dfitemscluster <- tibble(
+  names = names(IS$membership$empirical),
+  values = IS$membership$empirical
+)
+
+# Import the CSV file
+used_variables <- ImportUsedvar()  %>%
+  select(variable, question , dimension)
+
+# Perform a join operation
+dfitemscluster <- dfitemscluster %>%
+  left_join(used_variables, by = c("names" = "variable"))
+```
+
+```{r}
+write_csv(dfitemscluster, "../../data/processed/EGA_itemclusters.csv")
+```
+
+After saving the data, an EGAdimensions.csv was made manually to compare the EGA dimensions with EWCS ones and to assign a proper name to these dimensions.
