@@ -181,8 +181,8 @@ df_numeric <- df %>%
 
 ```{r}
 # just saving the datasets in different formats
-write_spss(df, "../data/processed/df_numeric.sav")
-write_csv(df_numeric, "../data/processed/df_numeric.csv")
+write_spss(df, "../../data/processed/df_numeric.sav")
+write_csv(df_numeric, "../../data/processed/df_numeric.csv")
 ```
 
 ```{r}

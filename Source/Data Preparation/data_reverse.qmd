@@ -23,8 +23,8 @@ library(corrplot)
 
 To choose which variables to reverse we will use the manually prepared .csv
 ```{r}
-df <- read_csv("../data/processed/df_numeric.csv", show_col_types = FALSE)
-reversedf<-read_csv2("../data/var_to_reverse.csv", show_col_types = FALSE)
+df <- read_csv("../../data/processed/df_numeric.csv", show_col_types = FALSE)
+reversedf<-read_csv2("../../data/var_to_reverse.csv", show_col_types = FALSE)
 ```
 ```{r}
 # Using the syntax of the prepared .csv, we can setup an array of variables to reverse
@@ -57,7 +57,7 @@ dimensionsdf<- usedvar %>% filter(!is.na(dimension)) %>% select(variable, dimens
 
 ```{r}
 #Saving the new dataframe where the correct variables are reversed
-write_csv(df, "../data/processed//df_reversed.csv")
+write_csv(df, "../../data/processed//df_reversed.csv")
 ```
 
 # Computing Cronbach's Alpha for EWCS-defined variables.
@@ -123,7 +123,7 @@ for (dim in unique(dimensionsdf$dimension)) {
          addCoef.col = "black", # Add correlation coefficient to the plot
          tl.col = "black", tl.srt = 45, # Text color and rotation
          title=dim, # Set the title
-     mar=c(0,0,1,0) # http://stackoverflow.com/a/14754408/54964
+     mar=c(0,0,1,0) # source: http://stackoverflow.com/a/14754408/54964
 )
 }
 ```

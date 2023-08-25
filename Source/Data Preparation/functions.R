@@ -31,7 +31,7 @@ library(tidyr)      # Tidy Data
 # Returns: A filtered dataframe of used variables.
 
 ImportUsedvar <- function( M1 = TRUE) {
-  usedvar <- read_csv2("../data/used_variables.csv", show_col_types = FALSE)
+  usedvar <- read_csv2("../../data/used_variables.csv", show_col_types = FALSE)
   
   if (!M1) {
     usedvar <- usedvar %>% 
@@ -46,7 +46,7 @@ ImportUsedvar <- function( M1 = TRUE) {
 # Returns: The original dataset.
 
 ImportOriginalDataset <- function(){
-  sourcedf <- read_spss("../data/source/ewcts_2021_isco2_nace2_nuts2.sav") 
+  sourcedf <- read_spss("../../data/source/ewcts_2021_isco2_nace2_nuts2.sav") 
   return(sourcedf)
 }
 
@@ -55,7 +55,7 @@ ImportOriginalDataset <- function(){
 # Returns: The dataframe where the variables have been reversed.
 
 ImportReversedDF <- function(){
-  sourcedf <- read_csv("../data/processed/df_reversed.csv",show_col_types = FALSE) 
+  sourcedf <- read_csv("../../data/processed/df_reversed.csv",show_col_types = FALSE) 
   return(sourcedf)
 }
 
