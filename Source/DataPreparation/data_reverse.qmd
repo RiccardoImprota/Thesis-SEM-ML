@@ -24,11 +24,11 @@ library(corrplot)
 To choose which variables to reverse we will use the manually prepared .csv
 ```{r}
 df <- read_csv("../../data/processed/df_numeric.csv", show_col_types = FALSE)
-reversedf<-read_csv2("../../data/var_to_reverse.csv", show_col_types = FALSE)
+toreversedf<-read_csv2("../../data/var_to_reverse.csv", show_col_types = FALSE)
 ```
 ```{r}
 # Using the syntax of the prepared .csv, we can setup an array of variables to reverse
-vars_to_reverse <- as.character(na.omit(reversedf[reversedf$toreverse == 'y', ])$variables)
+vars_to_reverse <- as.character(na.omit(toreversedf[toreversedf$toreverse == 'y', ])$variables)
 ```
 
 ```{r}

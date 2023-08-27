@@ -7,7 +7,7 @@ library(readr)  # Data import
 library(psych)
 print(getwd())
 
-source("../Data Preparation/functions.R")
+source("../DataPreparation/functions.R")
 
 df <-ImportReversedDF()
 
