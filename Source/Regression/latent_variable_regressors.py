@@ -61,7 +61,7 @@ class GBoostRegression:
         self.model = None
         self.results = {}
         self.shap_values = None
-        self.explainer_xgb  = None
+
 
     def train(self,scoringmetric='neg_mean_squared_error',verbosity=1,n_iter=60,cv=5,computeshap=True):
         """
@@ -73,12 +73,12 @@ class GBoostRegression:
         self.n_iter = n_iter
         self.cv = cv
 
-        # Define the hyperparameter search space
+
         search_spaces = {
-        'learning_rate': Real(0.01, 0.08, 'log-uniform'),  # Typical range for learning rates; 'log-uniform' because smaller changes matter more for learning rates
-        'n_estimators': Integer(50, 300),  # Allow for a wide range of trees, but don't go too low
-        'max_depth': Integer(1, 6),  # Range allowing for deeper trees which might be needed for complex datasets
-        'min_child_weight': Integer(2, 10),  # Default is 1, but higher values make the algorithm more conservative
+        'learning_rate': Real(0.01, 0.1, 'log-uniform'),  # Typical range for learning rates; 'log-uniform' because smaller changes matter more for learning rates
+        'n_estimators': Integer(100, 400),  # Allow for a wide range of trees, but don't go too low
+        'max_depth': Integer(3, 10),  # Range allowing for deeper trees which might be needed for complex datasets
+        'min_child_weight': Integer(1, 10),  # Default is 1, but higher values make the algorithm more conservative
         'subsample': Real(0.5, 1.0, 'uniform'),  # Typical range to prevent overfitting
         'colsample_bytree': Real(0.5, 1.0, 'uniform'),  # Subsample ratio of columns when constructing each tree
         'colsample_bylevel': Real(0.5, 1.0, 'uniform'),  # Subsample ratio of columns for each level in the tree
@@ -384,6 +384,7 @@ class LinearRegressionModel:
         self.y_train_pred = None
         self.y_pred = None
         self.results = {}
+        self.model = None
         self.shap_values = None
 
 
