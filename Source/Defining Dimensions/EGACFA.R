@@ -1,5 +1,5 @@
 # load the necessary packages
-library(lavaan, quietly=TRUE, warn.conflicts=FALSE)
+suppressPackageStartupMessages(library(lavaan, quietly=TRUE, warn.conflicts=FALSE))
 library(readr, quietly=TRUE, warn.conflicts=FALSE)  # Data import
 library(psych, quietly=TRUE, warn.conflicts=FALSE)
 print(getwd())
@@ -14,7 +14,7 @@ train_df <-read_csv("data\\processed\\factordatasets\\traindf.csv", show_col_typ
 test_df <-read_csv("data\\processed\\factordatasets\\testdf.csv", show_col_types = FALSE)
 
 # Importing the dimensions
-EGAdimensions <-read_csv2("data\\EGAdimensions.csv", show_col_types = FALSE)
+EGAdimensions <-suppressMessages(read_csv2("data\\EGAdimensions.csv", show_col_types = FALSE))
 
 
 # Removing the variables to remove numerical and dichotomic
@@ -43,7 +43,7 @@ print("Starting CFA")
 # Fit the CFA model to the training and testing data
 fittrain <- cfa(model_string, data=cfatrain_df, estimator="WLSMV", missing = "pairwise",ordered=TRUE)
 fittest <- cfa(model_string, data=cfatest_df, estimator="WLSMV", missing = "pairwise",ordered=TRUE)
-summary(fittrain, fit.measures = TRUE, standardized = T)
+#summary(fittrain, fit.measures = TRUE, standardized = T)
 #summary(fittest, fit.measures = TRUE, standardized = T)
 
 

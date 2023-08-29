@@ -122,8 +122,8 @@ class DataProcessor:
         # Rscript path
         r_script_path = "C:\\Program Files\\R\\R-4.3.1\\bin\\Rscript.exe"
         
-        # check if the R script file exists
-        print(os.path.isfile(script_path))
+        if os.path.isfile(script_path) != True:
+            raise ValueError(f"Invalid script path.")
 
 
         print('Starting the CFA')
@@ -131,12 +131,11 @@ class DataProcessor:
         process_result = subprocess.run([r_script_path, script_path], capture_output=True, text=True)
 
         # Print the output
-        print("STDOUT:")
-        print(process_result.stdout)
-
+        #print("STDOUT:")
+        #print(process_result.stdout)
         # Print the error if there's any
         if process_result.stderr:
-            print("STDERR:")
+            print("Error in the R code:")
             print(process_result.stderr)
 
     def read_cfadatasets(self):
@@ -224,4 +223,4 @@ class DataProcessor:
                 y_test = y_test.replace(1, 2) - 1
 
 
-        return X_train,y_train,X_test,y_test
+        return X_train.astype("float64"),y_train.astype("float64"),X_test.astype("float64"),y_test.astype("float64")
