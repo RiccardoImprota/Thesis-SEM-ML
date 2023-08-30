@@ -60,7 +60,7 @@ class GBoostClassification:
         self.model = None
         self.results = {}
 
-    def train(self,scoringmetric='neg_mean_squared_error',verbosity=1,n_iter=60,cv=5,computeshap=True):
+    def train(self,scoringmetric='neg_mean_squared_error',verbosity=1,n_iter=60,cv=5):
         """
         Train the XGB classifier with Bayesian optimization.
         Also, computes SHAP values for interpretability.
@@ -104,9 +104,10 @@ class GBoostClassification:
 
         self.y_pred = self.model.predict(self.x_test)
         self.y_pred = self.y_pred + 1
-        self.y_proba = self.model.predict_proba(x_test)
+        self.y_proba = self.model.predict_proba(self.x_test)
 
         self.y_train_pred = self.model.predict(self.x_train)
+        self.y_train_pred = self.y_train_pred + 1
 
         self._compute_training_error()
         self._compute_metrics()
@@ -115,8 +116,8 @@ class GBoostClassification:
         """
         Compute the training error.
         """
-        train_accuracy = accuracy(self.y_train, self.y_train_pred)
-        train_precision = precision(self.y_train, self.y_train_pred, average='weighted',zero_division=np.nan)
+        train_accuracy = accuracy_score(self.y_train, self.y_train_pred)
+        train_precision = precision_score(self.y_train, self.y_train_pred, average='weighted',zero_division=np.nan)
         train_recall = recall_score(self.y_train, self.y_train_pred, average='weighted',zero_division=np.nan)
         self.results["train_accuracy"] = train_accuracy
         self.results["train_precision"] = train_precision
@@ -148,7 +149,7 @@ class GBoostClassification:
         """
         Return the probabilities.
         """
-        return self.y_score
+        return self.y_proba
 
 
 
@@ -188,35 +189,42 @@ class LogisticRegressionClass:
 
 
 
-    def train(self,computeshap=True):
+    def train(self,verbosity=1,n_iter=10,cv=5):
         """
-        Train the Linear Regression model and compute SHAP values.
+        Train the Logistic Regression with Bayesian optimization.
         """
-        self.model = LogisticRegression()
-        print('Starting the Linear Regression training')
-        self.model.fit(self.x_train, self.y_train)
-        
-        self.y_pred = self.model.predict(self.x_test)
-        self.y_train_pred = self.model.predict(self.x_train)
 
-        self._compute_training_error()
-        self._compute_metrics()
-        if computeshap==True:
-            self._compute_shap_values()
+        self.n_iter = n_iter
+        self.cv = cv
 
+        # Define the hyperparameter search space
+        search_spaces = {
+        'C': Real(0.01, 0.1, 'log-uniform'),  # Typical range for learning rates; 'log-uniform' because smaller changes matter more for learning rates
+        "max_iter": Integer(600, 1000)
+        }
+
+        opt = BayesSearchCV(
+            LogisticRegression(solver='saga',penalty='l2',multi_class='multinomial'),
+            search_spaces,
+            n_iter=n_iter,
+            cv=cv,
+            random_state=42,
+            verbose=verbosity
+        )
 
         print('Starting the Logistic Regression')
-        self.model = LogisticRegression()
         self.y_train = self.y_train-1
-        self.model.fit(self.x_train, self.y_train)
+        opt.fit(self.x_train, self.y_train)
+        self.model = opt.best_estimator_
         self.y_train = self.y_train + 1
 
 
         self.y_pred = self.model.predict(self.x_test)
         self.y_pred = self.y_pred + 1
-        self.y_proba = self.model.predict_proba(x_test)
+        self.y_proba = self.model.predict_proba(self.x_test)
 
         self.y_train_pred = self.model.predict(self.x_train)
+        self.y_train_pred = self.y_train_pred + 1
 
         self._compute_training_error()
         self._compute_metrics()
@@ -225,8 +233,8 @@ class LogisticRegressionClass:
         """
         Compute the training error.
         """
-        train_accuracy = accuracy(self.y_train, self.y_train_pred)
-        train_precision = precision(self.y_train, self.y_train_pred, average='weighted',zero_division=np.nan)
+        train_accuracy = accuracy_score(self.y_train, self.y_train_pred)
+        train_precision = precision_score(self.y_train, self.y_train_pred, average='weighted',zero_division=np.nan)
         train_recall = recall_score(self.y_train, self.y_train_pred, average='weighted',zero_division=np.nan)
         self.results["train_accuracy"] = train_accuracy
         self.results["train_precision"] = train_precision

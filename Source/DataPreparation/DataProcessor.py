@@ -218,7 +218,7 @@ class DataProcessor:
             columns_to_update = {'eng_timeflies', 'eng_enthusiastic', 'eng_energy'}
 
             if target_variable in columns_to_update:
-                print('tesr')
+                print('Values of the classes 1 and 2 were combined.')
                 y_train = y_train.replace(1, 2) - 1
                 y_test = y_test.replace(1, 2) - 1
 
