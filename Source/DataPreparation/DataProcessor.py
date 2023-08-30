@@ -137,6 +137,8 @@ class DataProcessor:
         if process_result.stderr:
             print("Error in the R code:")
             print(process_result.stderr)
+            raise ValueError(f"Cfa was not executed.")
+        
 
     def read_cfadatasets(self):
         """
