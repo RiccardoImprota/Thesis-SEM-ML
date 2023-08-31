@@ -138,7 +138,7 @@ class GBoostRegression:
         """
         Compute SHAP values.
         """
-        explainer = shap.Explainer(self.model)
+        explainer = shap.TreeExplainer(self.model)
         self.shap_values = explainer(self.x_test)
 
     def get_results(self,verbose=0):

@@ -1,0 +1,64 @@
+Dimension: eng_timeflies
+-------------------------------------------------
+Model: XGBoost for dimension: eng_timeflies
+Average Accuracy over 10 iterations: 0.46787709497206703
+Average Precision over 10 iterations: 0.44647556523061105
+Average Recall over 10 iterations: 0.46787709497206703
+Average TRAIN Accuracy over 10 iterations: 0.5543165467625899
+Average TRAIN Precision over 10 iterations: 0.6009140020124463
+Average TRAIN Recall over 10 iterations: 0.5543165467625899
+-------------------------------------------------
+Model: Logistic Regression for dimension: eng_timeflies
+Average Accuracy over 10 iterations: 0.46201117318435747
+Average Precision over 10 iterations: 0.4563993487832514
+Average Recall over 10 iterations: 0.46201117318435747
+Average TRAIN Accuracy over 10 iterations: 0.5241007194244605
+Average TRAIN Precision over 10 iterations: 0.5280691246411059
+Average TRAIN Recall over 10 iterations: 0.5241007194244605
+-------------------------------------------------
+Random classifier for dimension: "eng_timeflies". Average Accuracy over 10 iterations: 0.3191192534565089
+Majority classifier for dimension: "eng_timeflies". Average Accuracy over 10 iterations: 0.4223463687150838
+-------------------------------------------------
+
+Dimension: eng_enthusiastic
+-------------------------------------------------
+Model: Logistic Regression for dimension: eng_enthusiastic
+Average Accuracy over 10 iterations: 0.5315642458100558
+Average Precision over 10 iterations: 0.5322694868670423
+Average Recall over 10 iterations: 0.5315642458100558
+Average TRAIN Accuracy over 10 iterations: 0.6007194244604316
+Average TRAIN Precision over 10 iterations: 0.6057321330389432
+Average TRAIN Recall over 10 iterations: 0.6007194244604316
+-------------------------------------------------
+Model: XGBoost for dimension: eng_enthusiastic
+Average Accuracy over 10 iterations: 0.5360335195530725
+Average Precision over 10 iterations: 0.545857967395654
+Average Recall over 10 iterations: 0.5360335195530725
+Average TRAIN Accuracy over 10 iterations: 0.7709832134292566
+Average TRAIN Precision over 10 iterations: 0.7856582866693527
+Average TRAIN Recall over 10 iterations: 0.7709832134292566
+-------------------------------------------------
+Random classifier for dimension: "eng_enthusiastic". Average Accuracy over 10 iterations: 0.3129896070659468
+Majority classifier for dimension: "eng_enthusiastic". Average Accuracy over 10 iterations: 0.41145251396648047
+
+
+Dimension: eng_energy
+-------------------------------------------------
+Model: XGBoost for dimension: eng_energy
+Average Accuracy over 10 iterations: 0.541340782122905
+Average Precision over 10 iterations: 0.5313840362220825
+Average Recall over 10 iterations: 0.541340782122905
+Average TRAIN Accuracy over 10 iterations: 0.6826139088729017
+Average TRAIN Precision over 10 iterations: 0.7075310591918944
+Average TRAIN Recall over 10 iterations: 0.6826139088729017
+-------------------------------------------------
+Model: Logistic Regression for dimension: eng_energy
+Average Accuracy over 10 iterations: 0.5393854748603351
+Average Precision over 10 iterations: 0.5249622941184191
+Average Recall over 10 iterations: 0.5393854748603351
+Average TRAIN Accuracy over 10 iterations: 0.5842925659472422
+Average TRAIN Precision over 10 iterations: 0.5929527397558745
+Average TRAIN Recall over 10 iterations: 0.5842925659472422
+-------------------------------------------------
+Random classifier for dimension: "eng_energy". Average Accuracy over 10 iterations: 0.33156892731188164
+Majority classifier for dimension: "eng_energy". Average Accuracy over 10 iterations: 0.4798882681564246
