@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 # Importing libraries for machine learning
 import xgboost as xgb
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression, ElasticNet
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from sklearn.pipeline import Pipeline
@@ -403,10 +403,168 @@ class LinearRegressionModel:
         """
         Train the Linear Regression model and compute SHAP values.
         """
+
         self.model = LinearRegression()
         print('Starting the Linear Regression training')
         self.model.fit(self.x_train, self.y_train)
         
+        self.y_pred = self.model.predict(self.x_test)
+        self.y_train_pred = self.model.predict(self.x_train)
+
+        self._compute_training_error()
+        self._compute_metrics()
+        if computeshap==True:
+            self._compute_shap_values()
+
+        if computeshap==True:
+            self._compute_shap_values()
+
+    def _compute_training_error(self):
+        """
+        Compute the training error.
+        """
+        train_mse = mean_squared_error(self.y_train, self.y_train_pred)
+        train_r2 = r2_score(self.y_train, self.y_train_pred)
+        self.results["train_mse"] = train_mse
+        self.results["train_r2"] = train_r2
+
+
+    def _compute_metrics(self):
+        """
+        Compute evaluation metrics.
+        """
+        mse = mean_squared_error(self.y_test, self.y_pred)
+        mae = mean_absolute_error(self.y_test, self.y_pred)
+        r2 = r2_score(self.y_test, self.y_pred)
+        
+        self.results["mse"] = mse
+        self.results["mae"] = mae
+        self.results["r2"] = r2
+
+    def _compute_shap_values(self):
+        """
+        Compute SHAP values.
+        """
+        explainer = shap.Explainer(self.model, self.x_train)
+        self.shap_values = explainer(self.x_test)
+
+
+    def get_results(self,verbose=0):
+        """
+        Return the evaluation metrics.
+        """
+
+        if verbose>0:
+            print("Best Parameters:")
+            print(self.results['best_params'])
+    
+        
+            print("\n\nMetrics:")
+            print(f"MSE: {self.results['mse']}")
+            print(f"MAE: {self.results['mae']}")
+            print(f"R^2: {self.results['r2']}")
+        return self.results
+    
+    def get_shap_values(self):
+        """
+        Return the SHAP values.
+        """
+        return self.shap_values
+    
+
+
+    def save_model(self, directory='Models\\Regression', model_name=None):
+        """
+        Save the trained model and associated metadata to the specified directory.
+        
+        Args:
+            directory (str): Path to the directory where the model and its metadata will be saved.
+            model_name (str): Base name to use for saving the model and metadata files.
+        """
+        # Ensure directory exists
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        if model_name==None:
+            raise ValueError(f"A model name was not specified.")
+
+        # Save model to .pkl file
+        model_path = os.path.join(directory, f"{model_name}.pkl")
+        dump(self.model, model_path)
+
+        # Save model metadata to .json file
+        metadata = { "model": "Linear Regression",
+            "results": self.results
+        }
+        metadata_path = os.path.join(directory, f"{model_name}_metadata.json")
+        with open(metadata_path, 'w') as f:
+            json.dump(metadata, f, indent=4)
+
+        print(f"Model saved to {model_path}")
+        print(f"Metadata saved to {metadata_path}")
+
+
+
+####################################################################################################
+####################################################################################################
+####################################################################################################
+####################################################################################################
+
+
+class ElasticLinear:
+    """
+    Linear Regression model with SHAP values computation and evaluation metrics.
+    """
+    
+    def __init__(self, x_train, y_train, x_test, y_test):
+        """
+        Initializes data and prepares for training.
+        """
+        self.x_train = x_train
+        self.x_test = x_test
+        self.y_train = y_train
+        self.y_test = y_test
+        self.y_train_pred = None
+        self.y_pred = None
+        self.results = {}
+        self.model = None
+        self.shap_values = None
+
+
+    def median_imputation(self):
+        """
+        Applies median imputation to the training and test data.
+        """
+        imputer = SimpleImputer(strategy='median')
+        self.feature_names = self.x_train.columns # Save the column names before imputation
+        self.x_train = pd.DataFrame(imputer.fit_transform(self.x_train), columns=self.feature_names)
+        self.x_test = pd.DataFrame(imputer.transform(self.x_test), columns=self.feature_names)
+
+
+
+    def train(self,verbosity=1,n_iter=40,cv=5,computeshap=True):
+        """
+        Train the Linear Regression model and compute SHAP values.
+        """
+
+        search_spaces = {
+        'alpha': (0.001, 2.0, 'log-uniform'),
+        'l1_ratio': (0.01, 1.0)
+        }
+
+        opt = BayesSearchCV(
+            ElasticNet(),
+            search_spaces,
+            n_iter=n_iter,
+            cv=cv,
+            random_state=42,
+            verbose=verbosity
+        )
+
+
+        opt.fit(self.x_train, self.y_train)
+        self.model = opt.best_estimator_
+
         self.y_pred = self.model.predict(self.x_test)
         self.y_train_pred = self.model.predict(self.x_train)
 
