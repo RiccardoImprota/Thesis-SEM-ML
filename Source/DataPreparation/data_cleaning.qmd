@@ -124,10 +124,9 @@ remove these two outliers, will still making the code resilient enough if we wan
 ```{r}
 # Visualize potential outliers with a boxplot
 boxplot(df$age, df$seniority, df$usual_hours_week, names = c("age", "seniority", "usual_hours_week"), 
-        main = "Boxplot of Variables",
-        xlab = "Variable",
-        ylab = "Value",
-        col = "lightblue")
+        main = "Boxplot of selected numerical Variables",
+        xlab = " ",
+        ylab = "Value")
 
 ```
 
@@ -163,12 +162,16 @@ na_count <- df %>% summarise_all(function(x) sum(is.na(x)))
 
 na_count <- na_count %>% pivot_longer(cols = everything(), names_to = "variable", values_to = "value")
 
+
+
 # Create histogram
 ggplot(na_count, aes(x = value, y = reorder(variable, value))) +
-  geom_bar(stat = "identity", width = 0.5, fill = "steelblue") +
-  labs(x = "Count of NA", y = "Variable") +
-  xlim(0, nrow(df)) +
-  theme(axis.text.y = element_text(angle = 0, hjust = 1)) 
+  geom_bar(stat = "identity", width = 0.5, fill = "black", alpha=0.7) +
+  labs(title = "Distribution of Missing Values",
+       x = "Count of NA", y = "Variable") +
+  scale_x_continuous(breaks = c(300, 600, 900, 1192), limits = c(0, nrow(df))) +
+  theme_minimal() +
+  theme(axis.text.y = element_text(angle = 0, hjust = 1), plot.title = element_text(hjust = 0.5,vjust = 1))
 
 ```
 
