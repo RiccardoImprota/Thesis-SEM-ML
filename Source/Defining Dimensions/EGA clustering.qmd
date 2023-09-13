@@ -9,12 +9,13 @@ For the scope of this Thesis, it was decided to use EGA to select the dimensions
 
 ```{r}
 # Tidyverse
+getwd()
 library(dplyr)  # Data manipulation
 library(purrr)  # Functional programming
 library(readr)  # Data import
 
 # EGA
-source("../Data Preparation/functions.R")
+source("../DataPreparation/functions.R")
 library(EGAnet)
 library(sna)
 ```
