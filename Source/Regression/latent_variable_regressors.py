@@ -7,7 +7,8 @@ import matplotlib.pyplot as plt
 
 # Importing libraries for machine learning
 import xgboost as xgb
-from sklearn.linear_model import LinearRegression, ElasticNet
+from sklearn.linear_model import LinearRegression, ElasticNet, ElasticNetCV
+from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from sklearn.pipeline import Pipeline
@@ -531,7 +532,7 @@ class ElasticLinear:
         self.shap_values = None
 
 
-    def median_imputation(self):
+    def median_imputation(self, standardscaling=True):
         """
         Applies median imputation to the training and test data.
         """
@@ -540,6 +541,10 @@ class ElasticLinear:
         self.x_train = pd.DataFrame(imputer.fit_transform(self.x_train), columns=self.feature_names)
         self.x_test = pd.DataFrame(imputer.transform(self.x_test), columns=self.feature_names)
 
+        if standardscaling:
+            scaler = StandardScaler()
+            self.x_train = pd.DataFrame(scaler.fit_transform(self.x_train), columns=self.x_train.columns)
+            self.x_test = pd.DataFrame(scaler.transform(self.x_test), columns=self.x_test.columns)
 
 
     def train(self,verbosity=1,n_iter=40,cv=5,computeshap=True):
@@ -548,7 +553,7 @@ class ElasticLinear:
         """
 
         search_spaces = {
-        'alpha': (0.001, 2.0, 'log-uniform'),
+        'alpha': (0.0001, 1.0, 'log-uniform'),
         'l1_ratio': (0.01, 1.0)
         }
 
@@ -610,7 +615,7 @@ class ElasticLinear:
 
         if verbose>0:
             print("Best Parameters:")
-            print(self.results['best_params'])
+            print(self.model)
     
         
             print("\n\nMetrics:")
@@ -624,36 +629,3 @@ class ElasticLinear:
         Return the SHAP values.
         """
         return self.shap_values
-    
-
-
-    def save_model(self, directory='Models\\Regression', model_name=None):
-        """
-        Save the trained model and associated metadata to the specified directory.
-        
-        Args:
-            directory (str): Path to the directory where the model and its metadata will be saved.
-            model_name (str): Base name to use for saving the model and metadata files.
-        """
-        # Ensure directory exists
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-
-        if model_name==None:
-            raise ValueError(f"A model name was not specified.")
-
-        # Save model to .pkl file
-        model_path = os.path.join(directory, f"{model_name}.pkl")
-        dump(self.model, model_path)
-
-        # Save model metadata to .json file
-        metadata = { "model": "Linear Regression",
-            "results": self.results
-        }
-        metadata_path = os.path.join(directory, f"{model_name}_metadata.json")
-        with open(metadata_path, 'w') as f:
-            json.dump(metadata, f, indent=4)
-
-        print(f"Model saved to {model_path}")
-        print(f"Metadata saved to {metadata_path}")
-
