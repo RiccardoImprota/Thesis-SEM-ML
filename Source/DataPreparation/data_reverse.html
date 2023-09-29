@@ -225,59 +225,68 @@ Caused by warning:
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    purrr<span class="sc">::</span><span class="fu">map_df</span>(<span class="sc">~</span><span class="fu">list</span>( <span class="at">dimension =</span> .x,</span>
 <span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> psych<span class="sc">::</span><span class="fu">alpha</span>(df[, dimensionsdf<span class="sc">$</span>variable[dimensionsdf<span class="sc">$</span>dimension <span class="sc">==</span> .x]],<span class="at">check.keys =</span> <span class="cn">TRUE</span>)<span class="sc">$</span>total[[<span class="st">"std.alpha"</span>]]</span>
 <span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  ))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in psych::alpha(df[, dimensionsdf$variable[dimensionsdf$dimension == : Some items were negatively correlated with total scale and were automatically reversed.
+ This is indicated by a negative sign for the variable name.
+
+Warning in psych::alpha(df[, dimensionsdf$variable[dimensionsdf$dimension == : Some items were negatively correlated with total scale and were automatically reversed.
+ This is indicated by a negative sign for the variable name.</code></pre>
+</div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 10 × 2
-   dimension                      alpha
-   &lt;chr&gt;                          &lt;dbl&gt;
- 1 Environmental risks            0.713
- 2 Social Environment             0.621
- 3 Work Intensity                 0.598
- 4 Task Discretion                0.717
- 5 Organisational characteristics 0.726
- 6 Intrinsic job features         0.634
- 7 Social climate                 0.635
- 8 Work life balance              0.595
- 9 Worker Engagement              0.696
-10 WHO5                           0.806</code></pre>
+<pre><code># A tibble: 12 × 2
+   dimension                    alpha
+   &lt;chr&gt;                        &lt;dbl&gt;
+ 1 Environmental risks          0.713
+ 2 Social Environment           0.621
+ 3 Work Intensity               0.598
+ 4 Task Discretion              0.717
+ 5 Organisational Participation 0.726
+ 6 Working time arrangements    0.527
+ 7 Job Prospects                0.456
+ 8 Intrinsic job features       0.634
+ 9 Social climate               0.635
+10 Work life balance            0.595
+11 Worker Engagement            0.696
+12 WHO5                         0.806</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="do">### Complete alpha output for all dimensions</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (dim <span class="cf">in</span> <span class="fu">unique</span>(dimensionsdf<span class="sc">$</span>dimension)) {</span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  message <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">"Dimension being considered:"</span>, dim)</span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  border <span class="ot">&lt;-</span> <span class="fu">strrep</span>(<span class="st">"*"</span>, <span class="fu">nchar</span>(message) <span class="sc">+</span> <span class="dv">4</span>)</span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="fu">paste0</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">"</span>, border, <span class="st">"</span><span class="sc">\n</span><span class="st">* "</span>, message, <span class="st">" *</span><span class="sc">\n</span><span class="st">"</span>, border, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>), <span class="at">sep =</span> <span class="st">""</span>)</span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Get the variables for the desired dimension</span></span>
-<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>  dim_variables <span class="ot">&lt;-</span> dimensionsdf<span class="sc">$</span>variable[dimensionsdf<span class="sc">$</span>dimension <span class="sc">==</span> dim]</span>
-<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Remove the excluded variables</span></span>
-<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a>  exclude_var <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
-<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>  dim_variables <span class="ot">&lt;-</span> dim_variables[<span class="sc">!</span>dim_variables <span class="sc">%in%</span> exclude_var]</span>
-<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Compute the alpha coefficient</span></span>
-<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(psych<span class="sc">::</span><span class="fu">alpha</span>(df[, dim_variables]))</span>
-<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create the correlation matrix</span></span>
-<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a>  df_corr <span class="ot">&lt;-</span> df[, dim_variables]</span>
-<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a>  corr_matrix <span class="ot">&lt;-</span> <span class="fu">cor</span>(df_corr, <span class="at">use=</span><span class="st">"pairwise.complete.obs"</span>)</span>
-<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add extra margin at the top</span></span>
-<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">4</span>, <span class="dv">2</span>, <span class="dv">2</span>) <span class="sc">+</span> <span class="fl">0.1</span>)</span>
-<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create the correlation plot</span></span>
-<span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">corrplot</span>(corr_matrix, <span class="at">method =</span> <span class="st">"color"</span>, <span class="at">order =</span> <span class="st">"hclust"</span>, </span>
-<span id="cb27-31"><a href="#cb27-31" aria-hidden="true" tabindex="-1"></a>         <span class="at">addCoef.col =</span> <span class="st">"black"</span>, <span class="co"># Add correlation coefficient to the plot</span></span>
-<span id="cb27-32"><a href="#cb27-32" aria-hidden="true" tabindex="-1"></a>         <span class="at">tl.col =</span> <span class="st">"black"</span>, <span class="at">tl.srt =</span> <span class="dv">45</span>, <span class="co"># Text color and rotation</span></span>
-<span id="cb27-33"><a href="#cb27-33" aria-hidden="true" tabindex="-1"></a>         <span class="at">title=</span>dim, <span class="co"># Set the title</span></span>
-<span id="cb27-34"><a href="#cb27-34" aria-hidden="true" tabindex="-1"></a>     <span class="at">mar=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>) <span class="co"># source: http://stackoverflow.com/a/14754408/54964</span></span>
-<span id="cb27-35"><a href="#cb27-35" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb27-36"><a href="#cb27-36" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="do">### Complete alpha output for all dimensions</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (dim <span class="cf">in</span> <span class="fu">unique</span>(dimensionsdf<span class="sc">$</span>dimension)) {</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  message <span class="ot">&lt;-</span> <span class="fu">paste</span>(<span class="st">"Dimension being considered:"</span>, dim)</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  border <span class="ot">&lt;-</span> <span class="fu">strrep</span>(<span class="st">"*"</span>, <span class="fu">nchar</span>(message) <span class="sc">+</span> <span class="dv">4</span>)</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="fu">paste0</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">"</span>, border, <span class="st">"</span><span class="sc">\n</span><span class="st">* "</span>, message, <span class="st">" *</span><span class="sc">\n</span><span class="st">"</span>, border, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>), <span class="at">sep =</span> <span class="st">""</span>)</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Get the variables for the desired dimension</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>  dim_variables <span class="ot">&lt;-</span> dimensionsdf<span class="sc">$</span>variable[dimensionsdf<span class="sc">$</span>dimension <span class="sc">==</span> dim]</span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Remove the excluded variables</span></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>  exclude_var <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>  dim_variables <span class="ot">&lt;-</span> dim_variables[<span class="sc">!</span>dim_variables <span class="sc">%in%</span> exclude_var]</span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Compute the alpha coefficient</span></span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(psych<span class="sc">::</span><span class="fu">alpha</span>(df[, dim_variables]))</span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create the correlation matrix</span></span>
+<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a>  df_corr <span class="ot">&lt;-</span> df[, dim_variables]</span>
+<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a>  corr_matrix <span class="ot">&lt;-</span> <span class="fu">cor</span>(df_corr, <span class="at">use=</span><span class="st">"pairwise.complete.obs"</span>)</span>
+<span id="cb28-25"><a href="#cb28-25" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb28-26"><a href="#cb28-26" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add extra margin at the top</span></span>
+<span id="cb28-27"><a href="#cb28-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">4</span>, <span class="dv">2</span>, <span class="dv">2</span>) <span class="sc">+</span> <span class="fl">0.1</span>)</span>
+<span id="cb28-28"><a href="#cb28-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-29"><a href="#cb28-29" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create the correlation plot</span></span>
+<span id="cb28-30"><a href="#cb28-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">corrplot</span>(corr_matrix, <span class="at">method =</span> <span class="st">"color"</span>, <span class="at">order =</span> <span class="st">"hclust"</span>, </span>
+<span id="cb28-31"><a href="#cb28-31" aria-hidden="true" tabindex="-1"></a>         <span class="at">addCoef.col =</span> <span class="st">"black"</span>, <span class="co"># Add correlation coefficient to the plot</span></span>
+<span id="cb28-32"><a href="#cb28-32" aria-hidden="true" tabindex="-1"></a>         <span class="at">tl.col =</span> <span class="st">"black"</span>, <span class="at">tl.srt =</span> <span class="dv">45</span>, <span class="co"># Text color and rotation</span></span>
+<span id="cb28-33"><a href="#cb28-33" aria-hidden="true" tabindex="-1"></a>         <span class="at">title=</span>dim, <span class="co"># Set the title</span></span>
+<span id="cb28-34"><a href="#cb28-34" aria-hidden="true" tabindex="-1"></a>     <span class="at">mar=</span><span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">0</span>) <span class="co"># source: http://stackoverflow.com/a/14754408/54964</span></span>
+<span id="cb28-35"><a href="#cb28-35" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb28-36"><a href="#cb28-36" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 ***************************************************
@@ -452,9 +461,9 @@ autonomy_speed  0.07 0.09 0.29 0.32 0.23  0.2</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
-**************************************************************
-* Dimension being considered: Organisational characteristics *
-**************************************************************
+************************************************************
+* Dimension being considered: Organisational Participation *
+************************************************************
 
 Reliability analysis   
 Call: psych::alpha(x = df[, dim_variables])
@@ -489,8 +498,119 @@ consulted          0.14 0.09 0.17 0.25 0.34 0.21
 improv_workorg     0.10 0.07 0.20 0.31 0.32 0.20
 decision_influence 0.11 0.10 0.30 0.32 0.18 0.01</code></pre>
 </div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+*********************************************************
+* Dimension being considered: Working time arrangements *
+*********************************************************</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in psych::alpha(df[, dim_variables]): Some items were negatively correlated with the total scale and probably 
+should be reversed.  
+To do this, run the function again with the 'check.keys=TRUE' option</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Some items ( shortnotice able_hour_off ) were negatively correlated with the total scale and 
+probably should be reversed.  
+To do this, run the function again with the 'check.keys=TRUE' option</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in sqrt(Vtc): Si è prodotto un NaN</code></pre>
+</div>
 <div class="cell-output-display">
 <p><img src="data_reverse_files/figure-html/unnamed-chunk-9-5.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Reliability analysis   
+Call: psych::alpha(x = df[, dim_variables])
+
+  raw_alpha std.alpha G6(smc) average_r   S/N   ase mean   sd median_r
+     -0.21     -0.27  -0.077    -0.056 -0.21 0.055  2.8 0.53    -0.18
+
+    95% confidence boundaries 
+         lower alpha upper
+Feldt    -0.33 -0.21  -0.1
+Duhachek -0.32 -0.21  -0.1
+
+ Reliability if an item is dropped:
+              raw_alpha std.alpha G6(smc) average_r    S/N alpha se var.r med.r
+freetime_work    -0.253     -0.15 -0.0217    -0.046 -0.131    0.064 0.061 -0.16
+night            -0.364     -0.24 -0.0597    -0.069 -0.194    0.070 0.072 -0.19
+shortnotice      -0.018     -0.11  0.0015    -0.034 -0.099    0.048 0.060 -0.16
+able_hour_off    -0.069     -0.26 -0.0633    -0.074 -0.206    0.047 0.078 -0.21
+
+ Item statistics 
+                 n raw.r std.r r.cor  r.drop mean   sd
+freetime_work 1190  0.53  0.44   NaN -0.0467  2.2 1.11
+night         1192  0.57  0.48   NaN -0.0056  1.7 1.09
+shortnotice    947  0.22  0.42   NaN -0.1831  4.6 0.71
+able_hour_off 1187  0.30  0.49   NaN -0.1308  3.1 0.83
+
+Non missing response frequency for each item
+                 1    2    3    4    5 miss
+freetime_work 0.33 0.33 0.19 0.13 0.03 0.00
+night         0.65 0.14 0.11 0.07 0.03 0.00
+shortnotice   0.01 0.01 0.04 0.20 0.73 0.21
+able_hour_off 0.06 0.13 0.49 0.32 0.00 0.00</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+*********************************************
+* Dimension being considered: Job Prospects *
+*********************************************</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in psych::alpha(df[, dim_variables]): Some items were negatively correlated with the total scale and probably 
+should be reversed.  
+To do this, run the function again with the 'check.keys=TRUE' option</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="data_reverse_files/figure-html/unnamed-chunk-9-6.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Some items ( prospects learning_new_things ) were negatively correlated with the total scale and 
+probably should be reversed.  
+To do this, run the function again with the 'check.keys=TRUE' option
+Reliability analysis   
+Call: psych::alpha(x = df[, dim_variables])
+
+  raw_alpha std.alpha G6(smc) average_r   S/N   ase mean   sd median_r
+     0.024     0.036    0.12    0.0091 0.037 0.047  2.8 0.63    -0.09
+
+    95% confidence boundaries 
+         lower alpha upper
+Feldt    -0.07  0.02  0.11
+Duhachek -0.07  0.02  0.12
+
+ Reliability if an item is dropped:
+                    raw_alpha std.alpha G6(smc) average_r     S/N alpha se
+prospects               0.144    0.1484  0.1762    0.0549  0.1743    0.043
+undesirable_change      0.014    0.0062  0.0415    0.0021  0.0062    0.049
+losejob                -0.071   -0.0991 -0.0094   -0.0310 -0.0902    0.052
+learning_new_things    -0.017    0.0312  0.1206    0.0106  0.0322    0.052
+                    var.r med.r
+prospects           0.063 -0.08
+undesirable_change  0.031 -0.08
+losejob             0.043 -0.10
+learning_new_things 0.085 -0.12
+
+ Item statistics 
+                       n raw.r std.r  r.cor r.drop mean   sd
+prospects            767  0.51  0.44 -0.050 -0.056  3.1 1.20
+undesirable_change   774  0.47  0.52  0.275  0.014  2.1 0.98
+losejob             1169  0.60  0.57  0.383  0.063  1.9 1.06
+learning_new_things 1192  0.55  0.50  0.098  0.032  3.8 1.04
+
+Non missing response frequency for each item
+                       1    2    3    4    5 miss
+prospects           0.13 0.22 0.21 0.36 0.09 0.36
+undesirable_change  0.29 0.46 0.14 0.09 0.02 0.35
+losejob             0.44 0.36 0.09 0.08 0.03 0.02
+learning_new_things 0.03 0.07 0.24 0.36 0.30 0.00</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="data_reverse_files/figure-html/unnamed-chunk-9-7.png" class="img-fluid" width="672"></p>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
@@ -540,7 +660,7 @@ usefull_work      0.02 0.02 0.06 0.35 0.55 0.34
 er_balance        0.08 0.20 0.14 0.48 0.10 0.35</code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="data_reverse_files/figure-html/unnamed-chunk-9-6.png" class="img-fluid" width="672"></p>
+<p><img src="data_reverse_files/figure-html/unnamed-chunk-9-8.png" class="img-fluid" width="672"></p>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
@@ -578,7 +698,7 @@ wp_goodcoop    0.01 0.02 0.06 0.52 0.38 0.03
 wp_emptrustman 0.04 0.11 0.20 0.49 0.16 0.02</code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="data_reverse_files/figure-html/unnamed-chunk-9-7.png" class="img-fluid" width="672"></p>
+<p><img src="data_reverse_files/figure-html/unnamed-chunk-9-9.png" class="img-fluid" width="672"></p>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
@@ -624,7 +744,7 @@ wlb_tired         0.15 0.21 0.38 0.21 0.05    0
 wlb_concentration 0.30 0.29 0.32 0.07 0.01    0</code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="data_reverse_files/figure-html/unnamed-chunk-9-8.png" class="img-fluid" width="672"></p>
+<p><img src="data_reverse_files/figure-html/unnamed-chunk-9-10.png" class="img-fluid" width="672"></p>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
@@ -662,7 +782,7 @@ eng_enthusiastic 0.02 0.05 0.20 0.41 0.32    0
 eng_timeflies    0.02 0.05 0.18 0.43 0.32    0</code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="data_reverse_files/figure-html/unnamed-chunk-9-9.png" class="img-fluid" width="672"></p>
+<p><img src="data_reverse_files/figure-html/unnamed-chunk-9-11.png" class="img-fluid" width="672"></p>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
@@ -712,7 +832,7 @@ who5_rested      0.09 0.17 0.17 0.18 0.23 0.15    0
 who5_interesting 0.02 0.11 0.08 0.21 0.29 0.29    0</code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="data_reverse_files/figure-html/unnamed-chunk-9-10.png" class="img-fluid" width="672"></p>
+<p><img src="data_reverse_files/figure-html/unnamed-chunk-9-12.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>

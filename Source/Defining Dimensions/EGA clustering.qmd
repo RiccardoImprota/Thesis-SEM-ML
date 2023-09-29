@@ -44,6 +44,10 @@ preliminarybootdata <- bootEGA(
                     progress = FALSE,
                     )
 ```
+```{r}
+preliminarybootdata$frequency
+```
+
 
 ```{r}
 preliminaryIS <- itemStability(preliminarybootdata)
@@ -70,6 +74,10 @@ bootdata <- bootEGA(
                     progress = FALSE,
                     )
 ```
+```{r}
+bootdata$frequency
+```
+
 
 ```{r}
 IS <- itemStability(bootdata)

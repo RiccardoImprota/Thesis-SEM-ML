@@ -553,7 +553,7 @@ class ElasticLinear:
         """
 
         search_spaces = {
-        'alpha': (0.0001, 1.0, 'log-uniform'),
+        'alpha': (0.001, 2.0, 'log-uniform'),
         'l1_ratio': (0.01, 1.0)
         }
 
